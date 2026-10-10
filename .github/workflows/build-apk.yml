@@ -54,12 +54,14 @@ jobs:
 
       - name: Build Android Debug APK
         working-directory: ./frontend/android
-        run: |
-          ./gradlew assembleDebug --no-daemon 2>&1 | tee build.log || (echo "=== GRADLE BUILD FAILURE DETAILS ===" && tail -n 120 build.log && exit 1)
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Locate Generated APK
+        run: find frontend/android -name "*.apk"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: daymark-android-apk
-          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          path: frontend/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
