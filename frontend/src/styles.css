@@ -3339,6 +3339,226 @@ input:focus-visible {
   color: #ffffff;
 }
 
+/* ============================================================
+   Android APK Download Integration
+   ============================================================ */
+
+/* Topbar APK Button */
+.topbar-apk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border: 1px solid rgba(49, 100, 68, 0.28);
+  border-radius: 20px;
+  background: #eaf3ec;
+  color: #275239;
+  font-size: 0.77rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(32, 60, 42, 0.05);
+}
+
+.topbar-apk-btn:hover {
+  background: #275239;
+  color: #ffffff;
+  border-color: #275239;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(32, 60, 42, 0.15);
+}
+
+.dark-theme .topbar-apk-btn {
+  background: #193324;
+  border-color: #2b563c;
+  color: #a4dcb3;
+}
+
+.dark-theme .topbar-apk-btn:hover {
+  background: #2b563c;
+  color: #ffffff;
+}
+
+/* Auth Page APK Banner Box */
+.auth-apk-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 14px 18px;
+  border: 1px solid rgba(56, 102, 70, 0.16);
+  border-radius: 14px;
+  background: #f4f8f4;
+  transition: all 200ms ease;
+}
+
+.auth-apk-box:hover {
+  border-color: rgba(56, 102, 70, 0.35);
+  box-shadow: 0 4px 14px rgba(40, 75, 52, 0.06);
+}
+
+.auth-apk-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.auth-apk-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+.auth-apk-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #20402e;
+}
+
+.auth-apk-subtitle {
+  font-size: 0.74rem;
+  color: #5d7565;
+}
+
+.auth-apk-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #275239;
+  color: #ffffff !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 160ms ease;
+}
+
+.auth-apk-download-btn:hover {
+  background: #1c3c2a;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(39, 82, 57, 0.2);
+}
+
+.dark-theme .auth-apk-box {
+  background: #132118;
+  border-color: #263e2e;
+}
+
+.dark-theme .auth-apk-title {
+  color: #c9e6d0;
+}
+
+.dark-theme .auth-apk-subtitle {
+  color: #7d9e87;
+}
+
+.dark-theme .auth-apk-download-btn {
+  background: #2c593d;
+}
+
+.dark-theme .auth-apk-download-btn:hover {
+  background: #39704e;
+}
+
+/* Sidebar APK Card */
+.side-apk-card {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+}
+
+.side-apk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.side-apk-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(144, 214, 163, 0.2);
+  color: #bbf0cb;
+}
+
+.side-apk-tag {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.side-apk-title {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.side-apk-desc {
+  margin: 0 0 14px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.side-apk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.side-apk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #eef8f0;
+  color: #1f422e !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 160ms ease;
+}
+
+.side-apk-btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.side-apk-mirror {
+  font-size: 0.73rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+
+.side-apk-mirror:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media (max-width: 680px) {
+  .auth-apk-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .auth-apk-download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 
 
 

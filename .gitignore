@@ -24,4 +24,5 @@ frontend/.vite/
 # Builds & Outputs
 apk_output/
 *.apk
+!frontend/public/*.apk
 .vscode/
