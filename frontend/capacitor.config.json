@@ -1,0 +1,10 @@
+{
+  "appId": "com.daymark.todo",
+  "appName": "daymark",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}
+
