@@ -61,27 +61,30 @@ def create_session(user_id: int, response: Response, request: Request) -> None:
         request.url.scheme == "https"
         or request.headers.get("x-forwarded-proto", "").lower() == "https"
     )
+    samesite_policy = "none" if is_https else "lax"
     response.set_cookie(
         key=SESSION_COOKIE,
         value=token,
         max_age=SESSION_MAX_AGE,
         httponly=True,
         secure=is_https,
-        samesite="lax",
+        samesite=samesite_policy,
         path="/",
     )
 
 
-def delete_session(token: str | None, response: Response) -> None:
+def delete_session(token: str | None, response: Response, is_https: bool = False) -> None:
     if token:
         with get_connection() as connection:
             connection.execute(
                 "DELETE FROM sessions WHERE token_hash = ?", (_token_digest(token),)
             )
+    samesite_policy = "none" if is_https else "lax"
     response.delete_cookie(
         key=SESSION_COOKIE,
         httponly=True,
-        samesite="lax",
+        secure=is_https,
+        samesite=samesite_policy,
         path="/",
     )
 

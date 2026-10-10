@@ -6,8 +6,11 @@ export class ApiError extends Error {
   }
 }
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+
 export async function apiRequest(url, options = {}) {
-  const response = await fetch(url, {
+  const targetUrl = url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
+  const response = await fetch(targetUrl, {
     credentials: "include",
     ...options,
     headers: {

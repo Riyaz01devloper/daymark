@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -22,7 +23,10 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Todo API", version="1.0.0", lifespan=lifespan)
 
-# Allow CORS for local dev and flexible frontend hosting
+# Allow CORS for local dev, Vercel frontend, Render, and custom domains
+allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
+custom_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -32,8 +36,9 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        *custom_origins,
     ],
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"^https?://([a-zA-Z0-9-]+\.)*(vercel\.app|onrender\.com|localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
