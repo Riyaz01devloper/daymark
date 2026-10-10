@@ -20,3 +20,8 @@ app/todos.db*
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+
+# Builds & Outputs
+apk_output/
+*.apk
+.vscode/
