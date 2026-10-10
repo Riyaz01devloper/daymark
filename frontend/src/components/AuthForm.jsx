@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { apiRequest, ApiError } from "../api/client.js";
 
+const isNativeApp =
+  typeof window !== "undefined" &&
+  (Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    window.location.protocol === "capacitor:" ||
+    (window.location.hostname === "localhost" && /Android|iPhone|iPad/i.test(navigator.userAgent)));
+
 export default function AuthForm({ onAuthenticated }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -166,21 +172,23 @@ export default function AuthForm({ onAuthenticated }) {
           </p>
           <p className="privacy-note"><span aria-hidden="true">◇</span> Your tasks are private to your account.</p>
 
-          <div className="auth-apk-box">
-            <div className="auth-apk-icon" aria-hidden="true">📱</div>
-            <div className="auth-apk-content">
-              <span className="auth-apk-title">Prefer our Android App?</span>
-              <span className="auth-apk-subtitle">Get the official Daymark APK (4.2 MB)</span>
+          {!isNativeApp && (
+            <div className="auth-apk-box">
+              <div className="auth-apk-icon" aria-hidden="true">📱</div>
+              <div className="auth-apk-content">
+                <span className="auth-apk-title">Prefer our Android App?</span>
+                <span className="auth-apk-subtitle">Get the official Daymark APK (4.2 MB)</span>
+              </div>
+              <a
+                href="/daymark.apk"
+                download="daymark.apk"
+                className="auth-apk-download-btn"
+                title="Download Daymark Android App"
+              >
+                Download APK ↓
+              </a>
             </div>
-            <a
-              href="/daymark.apk"
-              download="daymark.apk"
-              className="auth-apk-download-btn"
-              title="Download Daymark Android App"
-            >
-              Download APK ↓
-            </a>
-          </div>
+          )}
         </div>
       </section>
     </main>

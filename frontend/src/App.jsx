@@ -1,10 +1,16 @@
 
 import { useEffect, useState } from "react";
-import { apiRequest, ApiError } from "./api/client.js";
+import { apiRequest, ApiError, clearAuthToken } from "./api/client.js";
 import AuthForm from "./components/AuthForm.jsx";
 import GradeSetup from "./components/GradeSetup.jsx";
 import PreviousYearPapers from "./components/PreviousYearPapers.jsx";
 import TodoItem from "./components/TodoItem.jsx";
+
+const isNativeApp =
+  typeof window !== "undefined" &&
+  (Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    window.location.protocol === "capacitor:" ||
+    (window.location.hostname === "localhost" && /Android|iPhone|iPad/i.test(navigator.userAgent)));
 
 const filters = [
   { id: "all", label: "All tasks" },
@@ -356,12 +362,14 @@ export default function App() {
   async function signOut() {
     try {
       await apiRequest("/auth/logout", { method: "POST" });
+    } catch (requestError) {
+      console.warn("Sign out request notice:", requestError.message);
+    } finally {
+      clearAuthToken();
       setUser(null);
       setTodos([]);
       setTitle("");
       setError("");
-    } catch (requestError) {
-      setError(`Could not sign out: ${requestError.message}`);
     }
   }
 
@@ -460,16 +468,18 @@ export default function App() {
             {darkMode ? "☀️ Light" : "🌙 Dark"}
           </button>
 
-          {/* Android App Download */}
-          <a
-            href="/daymark.apk"
-            download="daymark.apk"
-            className="topbar-apk-btn"
-            title="Download Daymark Android App (.apk)"
-          >
-            <span aria-hidden="true">📱</span>
-            <span>Android App</span>
-          </a>
+          {/* Android App Download (shown on web only) */}
+          {!isNativeApp && (
+            <a
+              href="/daymark.apk"
+              download="daymark.apk"
+              className="topbar-apk-btn"
+              title="Download Daymark Android App (.apk)"
+            >
+              <span aria-hidden="true">📱</span>
+              <span>Android App</span>
+            </a>
+          )}
 
           <span className="date-label">
             {new Intl.DateTimeFormat(undefined, {
@@ -592,37 +602,39 @@ export default function App() {
             </div>
           </div>
 
-          {/* Android Mobile App Card */}
-          <div className="focus-card side-apk-card">
-            <div className="side-apk-header">
-              <span className="side-apk-badge">ANDROID APP</span>
-              <span className="side-apk-tag">v1.0.0 APK</span>
+          {/* Android Mobile App Card (shown on web only) */}
+          {!isNativeApp && (
+            <div className="focus-card side-apk-card">
+              <div className="side-apk-header">
+                <span className="side-apk-badge">ANDROID APP</span>
+                <span className="side-apk-tag">v1.0.0 APK</span>
+              </div>
+              <p className="side-apk-title">Daymark for Mobile</p>
+              <p className="side-apk-desc">
+                Get the official Android app on your phone for quick task planning on the go.
+              </p>
+              <div className="side-apk-actions">
+                <a
+                  href="/daymark.apk"
+                  download="daymark.apk"
+                  className="side-apk-btn"
+                  title="Download Daymark Android APK"
+                >
+                  <span>Download APK (4.2 MB)</span>
+                  <span aria-hidden="true">↓</span>
+                </a>
+                <a
+                  href="https://github.com/Riyaz01devloper/daymark/releases/tag/v1.0.0"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="side-apk-mirror"
+                  title="Download from GitHub Release mirror"
+                >
+                  GitHub mirror ↗
+                </a>
+              </div>
             </div>
-            <p className="side-apk-title">Daymark for Mobile</p>
-            <p className="side-apk-desc">
-              Get the official Android app on your phone for quick task planning on the go.
-            </p>
-            <div className="side-apk-actions">
-              <a
-                href="/daymark.apk"
-                download="daymark.apk"
-                className="side-apk-btn"
-                title="Download Daymark Android APK"
-              >
-                <span>Download APK (4.2 MB)</span>
-                <span aria-hidden="true">↓</span>
-              </a>
-              <a
-                href="https://github.com/Riyaz01devloper/daymark/releases/tag/v1.0.0"
-                target="_blank"
-                rel="noreferrer"
-                className="side-apk-mirror"
-                title="Download from GitHub Release mirror"
-              >
-                GitHub mirror ↗
-              </a>
-            </div>
-          </div>
+          )}
 
           <p className="side-footer">Made for your day, at your pace.</p>
         </aside>

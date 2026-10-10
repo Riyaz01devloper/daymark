@@ -50,7 +50,7 @@ def _token_digest(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def create_session(user_id: int, response: Response, request: Request) -> None:
+def create_session(user_id: int, response: Response, request: Request) -> str:
     token = secrets.token_urlsafe(32)
     with get_connection() as connection:
         connection.execute(
@@ -71,13 +71,28 @@ def create_session(user_id: int, response: Response, request: Request) -> None:
         samesite=samesite_policy,
         path="/",
     )
+    response.headers["X-Session-Token"] = token
+    return token
 
 
-def delete_session(token: str | None, response: Response, is_https: bool = False) -> None:
-    if token:
+def delete_session(
+    token: str | None,
+    response: Response,
+    request: Request | None = None,
+    is_https: bool = False,
+) -> None:
+    extracted_token = token
+    if not extracted_token and request:
+        auth_header = request.headers.get("authorization", "")
+        if auth_header.startswith("Bearer "):
+            extracted_token = auth_header[7:].strip()
+        elif request.headers.get("x-session-token"):
+            extracted_token = request.headers.get("x-session-token").strip()
+
+    if extracted_token:
         with get_connection() as connection:
             connection.execute(
-                "DELETE FROM sessions WHERE token_hash = ?", (_token_digest(token),)
+                "DELETE FROM sessions WHERE token_hash = ?", (_token_digest(extracted_token),)
             )
     samesite_policy = "none" if is_https else "lax"
     response.delete_cookie(
@@ -90,9 +105,20 @@ def delete_session(token: str | None, response: Response, is_https: bool = False
 
 
 def get_current_user(
+    request: Request,
     session_token: str | None = Cookie(default=None, alias=SESSION_COOKIE),
 ) -> UserRead:
-    if not session_token:
+    # 1. Check Authorization Bearer header
+    auth_header = request.headers.get("authorization", "")
+    token = None
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:].strip()
+    elif request.headers.get("x-session-token"):
+        token = request.headers.get("x-session-token").strip()
+    elif session_token:
+        token = session_token
+
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in to continue"
         )
@@ -108,7 +134,7 @@ def get_current_user(
             JOIN users ON users.id = sessions.user_id
             WHERE sessions.token_hash = ? AND sessions.expires_at > ?
             """,
-            (_token_digest(session_token), int(time.time())),
+            (_token_digest(token), int(time.time())),
         ).fetchone()
 
     if row is None:
@@ -117,7 +143,7 @@ def get_current_user(
         )
     user_lang = row["language"] if has_lang and row["language"] else "en"
     return UserRead(
-        id=row["id"], email=row["email"], grade=row["grade"], language=user_lang
+        id=row["id"], email=row["email"], grade=row["grade"], language=user_lang, token=token
     )
 
 

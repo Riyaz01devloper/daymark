@@ -706,6 +706,36 @@ def test_language_preference_and_hindi_content(client: TestClient) -> None:
     assert "Science" in curriculum_en.json()["curriculum"]
 
 
+def test_bearer_token_authentication(client: TestClient) -> None:
+    # 1. Register and login
+    email = "tokenuser@example.com"
+    client.post("/auth/register", json={"email": email, "password": TEST_PIN})
+    login_res = client.post("/auth/login", json={"email": email, "password": TEST_PIN})
+    assert login_res.status_code == 200
+    token = login_res.json().get("token")
+    assert token is not None and len(token) > 20
+
+    # 2. Clear client cookies to simulate Android WebView with no cookies
+    client.cookies.clear()
+    assert client.get("/auth/me").status_code == 401
+
+    # 3. Use Authorization: Bearer <token> header
+    headers = {"Authorization": f"Bearer {token}"}
+    me_res = client.get("/auth/me", headers=headers)
+    assert me_res.status_code == 200
+    assert me_res.json()["email"] == email
+
+    # 4. Patch profile with Bearer token (what GradeSetup does)
+    profile_res = client.patch("/auth/profile", json={"grade": 10}, headers=headers)
+    assert profile_res.status_code == 200
+    assert profile_res.json()["grade"] == 10
+
+    # 5. Create todo with Bearer token
+    todo_res = client.post("/todos", json={"title": "Test Bearer Todo"}, headers=headers)
+    assert todo_res.status_code == 201
+    assert todo_res.json()["title"] == "Test Bearer Todo"
+
+
 
 
 

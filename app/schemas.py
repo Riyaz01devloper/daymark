@@ -54,6 +54,7 @@ class UserRead(BaseModel):
     email: str
     grade: int | None = None
     language: str = "en"
+    token: str | None = None
 
 
 class ProfileUpdate(BaseModel):

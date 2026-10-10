@@ -89,10 +89,10 @@ def login(account: AccountLogin, request: Request, response: Response) -> UserRe
 
     with get_connection() as connection:
         connection.execute("DELETE FROM login_attempts WHERE email = ?", (account.email,))
-    create_session(row["id"], response, request)
+    token = create_session(row["id"], response, request)
     user_lang = row["language"] if has_lang and row["language"] else "en"
     return UserRead(
-        id=row["id"], email=row["email"], grade=row["grade"], language=user_lang
+        id=row["id"], email=row["email"], grade=row["grade"], language=user_lang, token=token
     )
 
 
@@ -163,9 +163,10 @@ def change_password(
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(
+    request: Request,
     response: Response,
     session_token: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
 ) -> Response:
-    delete_session(session_token, response)
+    delete_session(session_token, response, request=request)
     response.status_code = status.HTTP_204_NO_CONTENT
     return response
