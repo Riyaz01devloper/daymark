@@ -71,6 +71,16 @@ def initialize_database() -> None:
             CREATE INDEX IF NOT EXISTS idx_login_attempts_email_time
                 ON login_attempts(email, attempted_at);
 
+            CREATE TABLE IF NOT EXISTS rate_limits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                action TEXT NOT NULL,
+                key TEXT NOT NULL,
+                attempted_at INTEGER NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_rate_limits_action_key
+                ON rate_limits(action, key, attempted_at);
+
             CREATE TABLE IF NOT EXISTS study_tips (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

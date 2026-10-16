@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -23,13 +23,32 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Todo API", version="1.0.0", lifespan=lifespan)
 
-# Allow CORS for local dev, Vercel frontend, Render, and custom domains
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    is_https = (
+        request.url.scheme == "https"
+        or request.headers.get("x-forwarded-proto", "").lower() == "https"
+    )
+    if is_https:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+# Allow CORS for trusted domains: Vercel production, preview deployments, Render, and local apps
 allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
 custom_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://daymark-gamma-red.vercel.app",
+        "https://daymark-3swu.onrender.com",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
@@ -41,7 +60,7 @@ app.add_middleware(
         "capacitor://localhost",
         *custom_origins,
     ],
-    allow_origin_regex=r"^(https?|capacitor)://([a-zA-Z0-9-]+\.)*(vercel\.app|onrender\.com|localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"^(https?|capacitor)://(daymark(-[a-zA-Z0-9-]+)?\.vercel\.app|daymark-3swu\.onrender\.com|localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

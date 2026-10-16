@@ -6,7 +6,24 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const PROD_RENDER_BACKEND = "https://daymark-3swu.onrender.com";
+
+function resolveApiBase() {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined") {
+    const isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    if (isLocal && window.location.port !== "") {
+      return "";
+    }
+  }
+  return PROD_RENDER_BACKEND;
+}
+
+const API_BASE_URL = resolveApiBase();
 const TOKEN_STORAGE_KEY = "daymark_auth_token";
 
 export function getAuthToken() {

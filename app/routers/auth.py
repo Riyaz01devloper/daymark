@@ -28,10 +28,45 @@ LOGIN_WINDOW_SECONDS = 15 * 60
 LOGIN_MAX_ATTEMPTS = 10
 
 
+def _check_rate_limit(
+    action: str, key: str, max_attempts: int, window_seconds: int = 15 * 60
+) -> None:
+    now = int(time.time())
+    with get_connection() as connection:
+        connection.execute(
+            "DELETE FROM rate_limits WHERE attempted_at <= ?",
+            (now - window_seconds,),
+        )
+        attempts = connection.execute(
+            """
+            SELECT COUNT(*) AS total
+            FROM rate_limits
+            WHERE action = ? AND key = ? AND attempted_at > ?
+            """,
+            (action, key, now - window_seconds),
+        ).fetchone()["total"]
+
+        if attempts >= max_attempts:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Too many requests. Please try again in 15 minutes.",
+            )
+
+        connection.execute(
+            "INSERT INTO rate_limits (action, key, attempted_at) VALUES (?, ?, ?)",
+            (action, key, now),
+        )
+
+
 @router.post(
     "/register", response_model=UserRead, status_code=status.HTTP_201_CREATED
 )
-def register(account: AccountRegister) -> UserRead:
+def register(account: AccountRegister, request: Request) -> UserRead:
+    client_ip = (
+        request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        or (request.client.host if request.client else "unknown")
+    )
+    _check_rate_limit("register", client_ip, max_attempts=20)
     try:
         with get_connection() as connection:
             cursor = connection.execute(
@@ -144,6 +179,7 @@ def change_password(
     password_data: PasswordChange,
     user: UserRead = CurrentUser,
 ) -> Response:
+    _check_rate_limit("password_change", str(user.id), max_attempts=5)
     with get_connection() as connection:
         row = connection.execute(
             "SELECT password_hash FROM users WHERE id = ?",

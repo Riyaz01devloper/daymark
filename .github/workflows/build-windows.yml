@@ -39,3 +39,4 @@ jobs:
         with:
           name: daymark-windows-desktop
           path: frontend/dist-electron/*.exe
+
