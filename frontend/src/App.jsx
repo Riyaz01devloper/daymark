@@ -6,9 +6,13 @@ import GradeSetup from "./components/GradeSetup.jsx";
 import PreviousYearPapers from "./components/PreviousYearPapers.jsx";
 import TodoItem from "./components/TodoItem.jsx";
 
+const isElectron =
+  typeof window !== "undefined" && Boolean(window.electronAPI?.isElectron);
+
 const isNativeApp =
   typeof window !== "undefined" &&
-  (Boolean(window.Capacitor?.isNativePlatform?.()) ||
+  (isElectron ||
+    Boolean(window.Capacitor?.isNativePlatform?.()) ||
     window.location.protocol === "capacitor:" ||
     (window.location.hostname === "localhost" && /Android|iPhone|iPad/i.test(navigator.userAgent)));
 
@@ -468,6 +472,20 @@ export default function App() {
             {darkMode ? "☀️ Light" : "🌙 Dark"}
           </button>
 
+          {/* Windows Desktop App Download */}
+          {!isElectron && (
+            <a
+              href="https://github.com/Riyaz01devloper/daymark/releases/download/v1.0.0/daymark-setup.exe"
+              className="topbar-apk-btn topbar-win-btn"
+              title="Download Daymark for Windows (.exe)"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span aria-hidden="true">💻</span>
+              <span>Windows</span>
+            </a>
+          )}
+
           {/* Android App Download (shown on web only) */}
           {!isNativeApp && (
             <a
@@ -477,7 +495,7 @@ export default function App() {
               title="Download Daymark Android App (.apk)"
             >
               <span aria-hidden="true">📱</span>
-              <span>Android App</span>
+              <span>Android</span>
             </a>
           )}
 
@@ -602,35 +620,49 @@ export default function App() {
             </div>
           </div>
 
-          {/* Android Mobile App Card (shown on web only) */}
-          {!isNativeApp && (
+          {/* Daymark Desktop & Mobile Apps (shown on web) */}
+          {(!isElectron || !isNativeApp) && (
             <div className="focus-card side-apk-card">
               <div className="side-apk-header">
-                <span className="side-apk-badge">ANDROID APP</span>
-                <span className="side-apk-tag">v1.0.0 APK</span>
+                <span className="side-apk-badge">WINDOWS & ANDROID</span>
+                <span className="side-apk-tag">v1.0.0</span>
               </div>
-              <p className="side-apk-title">Daymark for Mobile</p>
+              <p className="side-apk-title">Daymark for Your Devices</p>
               <p className="side-apk-desc">
-                Get the official Android app on your phone for quick task planning on the go.
+                Install our official apps for Windows desktop or Android mobile.
               </p>
               <div className="side-apk-actions">
-                <a
-                  href="/daymark.apk"
-                  download="daymark.apk"
-                  className="side-apk-btn"
-                  title="Download Daymark Android APK"
-                >
-                  <span>Download APK (4.2 MB)</span>
-                  <span aria-hidden="true">↓</span>
-                </a>
+                {!isElectron && (
+                  <a
+                    href="https://github.com/Riyaz01devloper/daymark/releases/download/v1.0.0/daymark-setup.exe"
+                    className="side-apk-btn side-win-btn"
+                    title="Download Daymark Windows Installer (.exe)"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>💻 Windows (.exe)</span>
+                    <span aria-hidden="true">↓</span>
+                  </a>
+                )}
+                {!isNativeApp && (
+                  <a
+                    href="/daymark.apk"
+                    download="daymark.apk"
+                    className="side-apk-btn"
+                    title="Download Daymark Android APK"
+                  >
+                    <span>📱 Android (.apk)</span>
+                    <span aria-hidden="true">↓</span>
+                  </a>
+                )}
                 <a
                   href="https://github.com/Riyaz01devloper/daymark/releases/tag/v1.0.0"
                   target="_blank"
                   rel="noreferrer"
                   className="side-apk-mirror"
-                  title="Download from GitHub Release mirror"
+                  title="View all release downloads on GitHub"
                 >
-                  GitHub mirror ↗
+                  GitHub releases ↗
                 </a>
               </div>
             </div>

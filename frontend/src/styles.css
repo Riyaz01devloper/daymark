@@ -3698,10 +3698,70 @@ input:focus-visible {
     flex-direction: column;
     align-items: flex-start;
   }
+  .auth-apk-btn-group {
+    width: 100%;
+    flex-direction: column;
+  }
   .auth-apk-download-btn {
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Windows Desktop Download Buttons */
+.topbar-win-btn {
+  background: #eef4fb;
+  border-color: rgba(35, 95, 160, 0.28);
+  color: #1e4a78;
+}
+
+.topbar-win-btn:hover {
+  background: #1e4a78;
+  border-color: #1e4a78;
+  color: #ffffff;
+}
+
+.dark-theme .topbar-win-btn {
+  background: #132233;
+  border-color: #213d5b;
+  color: #9ac2ed;
+}
+
+.dark-theme .topbar-win-btn:hover {
+  background: #254a73;
+  color: #ffffff;
+}
+
+.side-win-btn {
+  background: #eaf1fa !important;
+  color: #1a426e !important;
+}
+
+.side-win-btn:hover {
+  background: #ffffff !important;
+}
+
+.auth-apk-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-win-btn {
+  background: #23517c !important;
+}
+
+.auth-win-btn:hover {
+  background: #183e61 !important;
+}
+
+.dark-theme .auth-win-btn {
+  background: #2a5580 !important;
+}
+
+.dark-theme .auth-win-btn:hover {
+  background: #376ea3 !important;
 }
 
 

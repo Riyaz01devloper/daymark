@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { apiRequest, ApiError } from "../api/client.js";
 
+const isElectron =
+  typeof window !== "undefined" && Boolean(window.electronAPI?.isElectron);
+
 const isNativeApp =
   typeof window !== "undefined" &&
-  (Boolean(window.Capacitor?.isNativePlatform?.()) ||
+  (isElectron ||
+    Boolean(window.Capacitor?.isNativePlatform?.()) ||
     window.location.protocol === "capacitor:" ||
     (window.location.hostname === "localhost" && /Android|iPhone|iPad/i.test(navigator.userAgent)));
 
@@ -172,21 +176,38 @@ export default function AuthForm({ onAuthenticated }) {
           </p>
           <p className="privacy-note"><span aria-hidden="true">◇</span> Your tasks are private to your account.</p>
 
-          {!isNativeApp && (
+          {(!isElectron || !isNativeApp) && (
             <div className="auth-apk-box">
-              <div className="auth-apk-icon" aria-hidden="true">📱</div>
+              <div className="auth-apk-icon" aria-hidden="true">💻</div>
               <div className="auth-apk-content">
-                <span className="auth-apk-title">Prefer our Android App?</span>
-                <span className="auth-apk-subtitle">Get the official Daymark APK (4.2 MB)</span>
+                <span className="auth-apk-title">Download Daymark App</span>
+                <span className="auth-apk-subtitle">Get the official desktop or mobile version</span>
               </div>
-              <a
-                href="/daymark.apk"
-                download="daymark.apk"
-                className="auth-apk-download-btn"
-                title="Download Daymark Android App"
-              >
-                Download APK ↓
-              </a>
+              <div className="auth-apk-btn-group">
+                {!isElectron && (
+                  <a
+                    href="https://github.com/Riyaz01devloper/daymark/releases/download/v1.0.0/daymark-setup.exe"
+                    className="auth-apk-download-btn auth-win-btn"
+                    title="Download Daymark Windows Installer (.exe)"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>💻 Windows</span>
+                    <span aria-hidden="true">↓</span>
+                  </a>
+                )}
+                {!isNativeApp && (
+                  <a
+                    href="/daymark.apk"
+                    download="daymark.apk"
+                    className="auth-apk-download-btn"
+                    title="Download Daymark Android App"
+                  >
+                    <span>📱 Android</span>
+                    <span aria-hidden="true">↓</span>
+                  </a>
+                )}
+              </div>
             </div>
           )}
         </div>

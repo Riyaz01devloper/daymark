@@ -25,4 +25,8 @@ frontend/.vite/
 apk_output/
 *.apk
 !frontend/public/*.apk
+*.exe
+*.blockmap
+frontend/dist-electron/
+dist-electron/
 .vscode/
